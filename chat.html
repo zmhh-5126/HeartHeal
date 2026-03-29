@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史名人对话 - HeartHeal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .header {
+            width: 100%;
+            height: 218px;
+            opacity: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to top, rgba(102, 126, 234, 0.8), rgba(102, 126, 234, 0));
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-bar h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333333;
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .search-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-list {
+            min-height: calc(100vh - 218px - 60px);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 0;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            margin: 0 15px 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .chat-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 2px solid #f0f0f0;
+        }
+
+        .chat-item .chat-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .chat-item .chat-info .name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333333;
+            margin-bottom: 4px;
+        }
+
+        .chat-item .chat-info .message {
+            font-size: 14px;
+            color: #666666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-item .last-time {
+            color: #999999;
+            font-size: 12px;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header {
+                height: 180px;
+            }
+            
+            .header-bar h1 {
+                font-size: 18px;
+            }
+            
+            .chat-item {
+                padding: 12px 15px;
+                margin: 0 10px 8px;
+            }
+            
+            .chat-item img {
+                width: 45px;
+                height: 45px;
+                margin-right: 12px;
+            }
+            
+            .chat-item .chat-info .name {
+                font-size: 15px;
+            }
+            
+            .chat-item .chat-info .message {
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                height: 150px;
+            }
+            
+            .header-bar {
+                padding: 12px 15px;
+            }
+            
+            .header-bar h1 {
+                font-size: 16px;
+            }
+            
+            .chat-item {
+                padding: 10px 12px;
+                margin: 0 8px 6px;
+            }
+            
+            .chat-item img {
+                width: 40px;
+                height: 40px;
+                margin-right: 10px;
+            }
+            
+            .chat-item .chat-info .name {
+                font-size: 14px;
+            }
+            
+            .chat-item .chat-info .message {
+                font-size: 12px;
+            }
+            
+            .chat-item .last-time {
+                font-size: 11px;
+            }
+        }
+        
+        /* 危机干预弹窗样式 */
+        #crisis-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            font-family: Arial, sans-serif;
+            animation: fadeIn 0.3s ease-out;
+            backdrop-filter: blur(5px);
+        }
+        
+        #crisis-modal .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            color: white;
+            animation: slideUp 0.4s ease-out;
+            position: relative;
+            overflow: hidden;
+            transform: perspective(1000px) rotateX(0deg);
+            transition: transform 0.3s ease;
+        }
+        
+        #crisis-modal .decoration {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        #crisis-modal .decoration-1 {
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        #crisis-modal .decoration-2 {
+            bottom: -70px;
+            left: -70px;
+            width: 180px;
+            height: 180px;
+            background: rgba(255, 255, 255, 0.08);
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        #crisis-modal .modal-title {
+            margin-bottom: 20px;
+            font-size: 32px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #crisis-modal .modal-message {
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 16px;
+            position: relative;
+            z-index: 1;
+            opacity: 0.95;
+        }
+        
+        #crisis-modal .hotline-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        #crisis-modal .hotline-label {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        #crisis-modal .hotline-number {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #crisis-modal .resources {
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #crisis-modal .resources-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        #crisis-modal .resource-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #crisis-modal .resource-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: block;
+        }
+        
+        #crisis-modal .resource-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        #crisis-modal .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #crisis-modal .call-button {
+            flex: 1;
+            padding: 18px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #crisis-modal .call-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.5);
+        }
+        
+        #crisis-modal .close-button {
+            flex: 1;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #crisis-modal .close-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        #crisis-modal .additional-info {
+            margin-top: 25px;
+            font-size: 14px;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) perspective(1000px) rotateX(5deg);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) perspective(1000px) rotateX(0deg);
+            }
+        }
+        
+        @keyframes slideDown {
+            from { 
+                opacity: 1;
+                transform: translateY(0) perspective(1000px) rotateX(0deg);
+            }
+            to { 
+                opacity: 0;
+                transform: translateY(30px) perspective(1000px) rotateX(-5deg);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header"></div>
+    
+    <div class="header-bar">
+        <h1>聊天列表</h1>
+        <img src="image/search.png" alt="搜索" class="search-icon">
+    </div>
+    
+    <div class="chat-list">
+        <div class="chat-item" data-id="1" data-name="巴金" data-bot-id="7431478367968591882">
+            <img src="image/巴金.jpg" alt="巴金头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">巴金</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">17min</span>
+        </div>
+        <div class="chat-item" data-id="2" data-name="冰心" data-bot-id="7431516494783660058">
+            <img src="image/冰心.jpg" alt="冰心头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">冰心</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">39min</span>
+        </div>
+        <div class="chat-item" data-id="3" data-name="林徽因" data-bot-id="7431514939569209385">
+            <img src="image/林徽因.jpg" alt="林徽因其头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">林徽因</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">1hour</span>
+        </div>
+        <div class="chat-item" data-id="4" data-name="鲁迅" data-bot-id="7431514075035222025">
+            <img src="image/鲁迅.jpg" alt="鲁迅头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">鲁迅</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">1hour</span>
+        </div>
+        <div class="chat-item" data-id="5" data-name="沈从文" data-bot-id="7431513401052151860">
+            <img src="image/沈从文.jpg" alt="沈从文头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">沈从文</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">3hour</span>
+        </div>
+        <div class="chat-item" data-id="6" data-name="萧红" data-bot-id="7431512277158723611">
+            <img src="image/萧红.jpg" alt="萧红头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">萧红</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">6hour</span>
+        </div>
+        <div class="chat-item" data-id="7" data-name="周恩来" data-bot-id="7431493569413824527">
+            <img src="image/周恩来.jpg" alt="周恩来头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">周恩来</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">7hour</span>
+        </div>
+        <div class="chat-item" data-id="8" data-name="徐志摩" data-bot-id="7424875494035963944">
+            <img src="image/徐志摩.jpg" alt="徐志摩头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">徐志摩</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">9hour</span>
+        </div>
+        <div class="chat-item" data-id="9" data-name="杨绛" data-bot-id="7431509463540187145">
+            <img src="image/杨绛.jpg" alt="杨绛头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">杨绛</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">yesterday</span>
+        </div>
+        <div class="chat-item" data-id="10" data-name="张爱玲" data-bot-id="7431495473682776115">
+            <img src="image/张爱玲.jpg" alt="张爱玲头像" loading="lazy">
+            <div class="chat-info">
+                <span class="name">张爱玲</span>
+                <span class="message">你好</span>
+            </div>
+            <span class="last-time">yesterday</span>
+        </div>
+    </div>
+
+    <script>
+        // 为所有聊天项添加点击事件
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const botId = this.getAttribute('data-bot-id');
+                const title = this.getAttribute('data-name');
+                
+                if (botId && title) {
+                    openChat(botId, title);
+                }
+            });
+        });
+        
+        // === 新的危机干预系统 ===
+        
+        // 危机关键词列表（更全面）
+        const crisisKeywords = [
+            // 直接表达
+            '我不想活了', '我觉得生活没有意思', '活着好累', '想自杀', '想死', '不想活',
+            '生活没有意义', '没有活下去的勇气', '生无可恋', '不如死了算了', '我要自杀',
+            '自杀', '轻生', '结束生命', '不想活了', '活不下去了', '我想去死', '我准备自杀',
+            '我打算自杀', '我有自杀的念头', '我考虑自杀', '我想结束自己的生命',
+            
+            // 间接表达
+            '一切都没有希望了', '我很绝望', '没有人关心我', '我孤独', '我痛苦',
+            '活着真难', '人生太苦', '没有意义', '心如死灰', '万念俱灰',
+            '生不如死', '死了更好', '死后解脱', '不再痛苦', '永远沉睡',
+            '活着没有盼头', '我的生活一团糟', '我无法承受', '我撑不下去了',
+            '我看不到未来', '我觉得很无助', '我被世界抛弃了', '没有人需要我',
+            '我是多余的', '我没有价值', '我一无是处', '我的存在没有意义'
+        ];
+        
+
+        
+        // 创建现代化危机干预弹窗
+        function createCrisisInterventionModal() {
+            // 检查弹窗是否已存在
+            if (document.getElementById('crisis-modal')) {
+                return;
+            }
+            
+            // 创建弹窗背景
+            const modalOverlay = document.createElement('div');
+            modalOverlay.id = 'crisis-modal';
+            
+            // 创建弹窗内容
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            
+            // 添加装饰元素
+            const decoration1 = document.createElement('div');
+            decoration1.className = 'decoration decoration-1';
+            
+            const decoration2 = document.createElement('div');
+            decoration2.className = 'decoration decoration-2';
+            
+            modalContent.appendChild(decoration1);
+            modalContent.appendChild(decoration2);
+            
+            // 标题
+            const title = document.createElement('h2');
+            title.className = 'modal-title';
+            title.textContent = '我们关心您';
+            
+            // 提示信息
+            const message = document.createElement('p');
+            message.className = 'modal-message';
+            message.textContent = '我们注意到您可能正在经历困难时期。请记住，您并不孤独，有专业的帮助随时可用。每一个生命都有价值，每一个困难都是暂时的。';
+            
+            // 热线号码卡片
+            const hotlineCard = document.createElement('div');
+            hotlineCard.className = 'hotline-card';
+            
+            const hotlineLabel = document.createElement('div');
+            hotlineLabel.className = 'hotline-label';
+            hotlineLabel.textContent = '24小时免费心理咨询热线';
+            
+            const hotlineNumber = document.createElement('div');
+            hotlineNumber.className = 'hotline-number';
+            hotlineNumber.textContent = '400-161-9995';
+            
+            hotlineCard.appendChild(hotlineLabel);
+            hotlineCard.appendChild(hotlineNumber);
+            
+            // 额外资源链接
+            const resources = document.createElement('div');
+            resources.className = 'resources';
+            
+            const resourcesTitle = document.createElement('h3');
+            resourcesTitle.className = 'resources-title';
+            resourcesTitle.textContent = '其他支持资源';
+            
+            const resourceList = document.createElement('div');
+            resourceList.className = 'resource-list';
+            
+            // 资源链接1
+            const resource1 = document.createElement('a');
+            resource1.href = 'https://www.nhc.gov.cn/jkj/s7915/202301/d00f0d1c114747d6a5f6814c53344b35.shtml';
+            resource1.target = '_blank';
+            resource1.className = 'resource-link';
+            resource1.textContent = '国家心理健康服务平台';
+            
+            // 资源链接2
+            const resource2 = document.createElement('a');
+            resource2.href = 'https://www.camc.com.cn/';
+            resource2.target = '_blank';
+            resource2.className = 'resource-link';
+            resource2.textContent = '中国心理学会';
+            
+            resourceList.appendChild(resource1);
+            resourceList.appendChild(resource2);
+            resources.appendChild(resourcesTitle);
+            resources.appendChild(resourceList);
+            
+            // 按钮容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+            
+            // 一键拨打按钮
+            const callButton = document.createElement('button');
+            callButton.className = 'call-button';
+            callButton.textContent = '一键拨打';
+            
+            callButton.addEventListener('click', function() {
+                window.location.href = 'tel:4001619995';
+            });
+            
+            // 关闭按钮
+            const closeButton = document.createElement('button');
+            closeButton.className = 'close-button';
+            closeButton.textContent = '稍后再说';
+            
+            closeButton.addEventListener('click', function() {
+                modalOverlay.style.animation = 'fadeOut 0.3s ease-out forwards';
+                modalContent.style.animation = 'slideDown 0.3s ease-out forwards';
+                setTimeout(() => {
+                    document.body.removeChild(modalOverlay);
+                }, 300);
+            });
+            
+            // 附加信息
+            const additionalInfo = document.createElement('div');
+            additionalInfo.className = 'additional-info';
+            additionalInfo.textContent = '请记住，困难只是暂时的，总会有希望。您值得被爱，值得拥有美好的生活。';
+            
+            // 组装弹窗
+            buttonContainer.appendChild(callButton);
+            buttonContainer.appendChild(closeButton);
+            
+            modalContent.appendChild(title);
+            modalContent.appendChild(message);
+            modalContent.appendChild(hotlineCard);
+            modalContent.appendChild(resources);
+            modalContent.appendChild(buttonContainer);
+            modalContent.appendChild(additionalInfo);
+            modalOverlay.appendChild(modalContent);
+            
+            // 添加到页面
+            document.body.appendChild(modalOverlay);
+        }
+        
+        // 检测危机语言
+        function detectCrisisLanguage(message) {
+            if (!message) {
+                console.log('检测失败：消息为空');
+                return false;
+            }
+            
+            // 提取消息内容
+            let messageContent = '';
+            if (typeof message === 'string') {
+                messageContent = message;
+            } else if (message.content) {
+                messageContent = message.content;
+            } else if (message.text) {
+                messageContent = message.text;
+            } else if (message.message) {
+                messageContent = message.message;
+            } else {
+                console.log('检测失败：无法提取消息内容', message);
+                return false;
+            }
+            
+            console.log('开始检测危机语言：', messageContent);
+            
+            // 转换为小写进行匹配
+            const messageLower = messageContent.toLowerCase();
+            
+            // 检查是否包含任何危机关键词
+            const matchedKeywords = crisisKeywords.filter(keyword => 
+                messageLower.includes(keyword.toLowerCase())
+            );
+            
+            if (matchedKeywords.length > 0) {
+                console.log('检测成功：匹配到危机关键词', matchedKeywords);
+                return true;
+            } else {
+                console.log('检测失败：未匹配到危机关键词');
+                return false;
+            }
+        }
+        
+        // 全局消息检测机制
+        function setupGlobalCrisisDetection() {
+            console.log('初始化全局危机检测机制');
+            
+            // 监听键盘事件，检测用户输入
+            document.addEventListener('keydown', function(event) {
+                // 检测是否按下了Enter键，可能是在发送消息
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    // 获取当前焦点元素
+                    const activeElement = document.activeElement;
+                    // 检查是否是输入框
+                    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable)) {
+                        const inputValue = activeElement.value || activeElement.textContent;
+                        console.log('Enter键发送消息，内容:', inputValue);
+                        if (detectCrisisLanguage(inputValue)) {
+                            console.log('检测到危机语言（Enter键）');
+                            // 显示危机干预弹窗
+                            createCrisisInterventionModal();
+                        }
+                    }
+                }
+            });
+            
+            // 监听所有点击事件，检测可能的发送按钮点击
+            document.addEventListener('click', function(event) {
+                const target = event.target;
+                // 检查是否是发送按钮或包含发送文本的元素
+                if (target) {
+                    const isSendButton = (
+                        target.textContent.includes('发送') || 
+                        target.textContent.includes('Send') || 
+                        target.textContent.includes('发送消息') ||
+                        target.className.includes('send') || 
+                        target.className.includes('submit') || 
+                        target.className.includes('send-btn') ||
+                        target.className.includes('btn') ||
+                        target.innerHTML.includes('发送') ||
+                        target.getAttribute('type') === 'submit' ||
+                        // 检测图标按钮（如纸飞机图标）
+                        target.innerHTML.includes('📤') ||
+                        target.innerHTML.includes('✈') ||
+                        target.innerHTML.includes('send') ||
+                        target.innerHTML.includes('paper-plane') ||
+                        target.getAttribute('aria-label') === '发送' ||
+                        target.getAttribute('aria-label') === 'Send'
+                    );
+                    
+                    if (isSendButton) {
+                        console.log('检测到发送按钮点击:', target);
+                        // 查找附近的输入框，扩大搜索范围
+                        const inputElement = target.closest('.chat-input') || 
+                                           target.closest('.input-container') || 
+                                           target.closest('.message-input') || 
+                                           target.closest('.input-group') ||
+                                           target.closest('.chat-container') ||
+                                           target.closest('.coze-chat') ||
+                                           document.querySelector('input[type="text"], input[type="textarea"], textarea, [contenteditable="true"]');
+                        
+                        if (inputElement) {
+                            const inputValue = inputElement.value || inputElement.textContent || '';
+                            console.log('发送按钮点击，输入内容:', inputValue);
+                            if (detectCrisisLanguage(inputValue)) {
+                                console.log('检测到危机语言（发送按钮）');
+                                // 显示危机干预弹窗
+                                createCrisisInterventionModal();
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 监听输入事件，实时检测输入内容
+            document.addEventListener('input', function(event) {
+                const target = event.target;
+                if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+                    const inputValue = target.value || target.textContent;
+                    // 只在输入内容较长时进行检测，避免频繁检测
+                    if (inputValue.length > 5) {
+                        console.log('输入事件，内容:', inputValue);
+                        // 这里不直接显示弹窗，只记录日志，避免干扰用户输入
+                        if (detectCrisisLanguage(inputValue)) {
+                            console.log('实时检测到危机语言（输入事件）');
+                        }
+                    }
+                }
+            });
+            
+            // 添加定时检测，确保机制正常运行
+            setInterval(function() {
+                console.log('危机检测机制运行中...');
+            }, 30000); // 每30秒检查一次
+        }
+        
+        // 初始化全局危机检测
+        setupGlobalCrisisDetection();
+        
+
+
+        
+        function openChat(botId, title) {
+            console.log('打开聊天:', title, 'Bot ID:', botId);
+            
+            const cozeWebSDK = new CozeWebSDK.WebChatClient({
+                config: {
+                    bot_id: botId,
+                },
+                componentProps: {
+                    title: 'Coze',
+                    layout: 'pc',
+                    width: 950,
+                },
+                ui: {
+                    base: {
+                        icon: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+                        layout: 'mobile',
+                        zIndex: 1000,
+                    },
+                    asstBtn: {
+                        isNeed: false,
+                    },
+                    footer: {
+                        isShow: true,
+                        expressionText: 'Powered by LoveMemo'
+                    },
+                    chatBot: {
+                        title: title,
+                        uploadable: false,
+                        width: '65%',
+                    }
+                },
+                events: {
+                    // 监听消息发送事件
+                    onSendMessage: function(message) {
+                        console.log('SDK消息发送事件:', message);
+                        // 直接使用detectCrisisLanguage函数检测消息
+                        if (detectCrisisLanguage(message)) {
+                            console.log('检测到危机语言（SDK事件）');
+                            // 显示危机干预弹窗
+                            createCrisisInterventionModal();
+                        }
+                    },
+                    // 监听消息接收事件
+                    onReceiveMessage: function(message) {
+                        console.log('SDK消息接收事件:', message);
+                    },
+                    // 监听聊天窗口打开事件
+                    onChatBotShow: function() {
+                        console.log('聊天窗口已打开，危机检测机制已激活');
+                        // 聊天窗口打开后，添加额外的DOM检测
+                        setTimeout(() => {
+                            setupChatWindowDetection();
+                        }, 1000);
+                    }
+                }
+            });
+
+            cozeWebSDK.showChatBot();
+        }
+        
+        // 为聊天窗口添加额外的检测机制
+        function setupChatWindowDetection() {
+            console.log('设置聊天窗口检测机制');
+            
+            // 定期检查聊天窗口中的输入框
+            setInterval(() => {
+                // 查找可能的聊天输入框
+                const chatInputs = document.querySelectorAll('input[type="text"], textarea, [contenteditable="true"]');
+                chatInputs.forEach(input => {
+                    // 检查输入框是否在聊天窗口中
+                    if (input.closest('.coze-chat') || input.closest('.chat-container')) {
+                        const inputValue = input.value || input.textContent || '';
+                        if (inputValue.length > 5) {
+                            // 这里不直接显示弹窗，只记录日志，避免干扰用户
+                            if (detectCrisisLanguage(inputValue)) {
+                                console.log('聊天窗口检测到危机语言');
+                            }
+                        }
+                    }
+                });
+            }, 5000); // 每5秒检查一次
+        }
+    </script>
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.0.0-beta.4/libs/cn/index.js"></script>
+</body>
+
+</html>
