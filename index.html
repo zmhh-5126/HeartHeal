@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录页面 - HeartHeal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 36px;
+            font-weight: 400;
+            line-height: 1.1;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.2;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.2;
+            color: rgba(255, 255, 255, 1);
+            margin-bottom: 8px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 5px;
+            background: #ffffff;
+            color: #4699aa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+        
+        .login-button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .privacy {
+            margin-top: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .privacy input {
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+        
+        .privacy label {
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 30px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .decor-top-left,
+            .decor-bottom-right,
+            .decor-bottom-left {
+                transform: scale(0.8);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            h2 {
+                font-size: 14px;
+            }
+            
+            .input-group input {
+                padding: 10px 12px;
+            }
+            
+            .login-button {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    
+    <div class="container">
+        <h1>HeartHeal</h1>
+        <h2>欢迎登陆</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">账号</label>
+                <input type="text" id="username" name="username" placeholder="输入用户名/手机号/邮箱" required>
+            </div>
+            <div class="input-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" placeholder="输入密码（6-12个数字或字母）" required>
+            </div>
+            <button type="submit" class="login-button">登陆</button>
+            <div class="privacy">
+                <input type="checkbox" id="privacy" name="privacy" required>
+                <label for="privacy">已阅读隐私与服务</label>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const privacy = document.getElementById('privacy').checked;
+
+            if (username && password && privacy) {
+                window.location.href = 'chat.html';
+            } else {
+                alert('请填写所有字段并同意隐私与服务条款');
+            }
+        });
+    </script>
+</body>
+</html>
